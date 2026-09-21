@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Dataset
+data/raw/*
+data/processed/*
+
+# Keep documentation files inside data/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/README.md
+
+# Trained model artifacts
+models/*
+!models/.gitkeep
+
+# Generated reports
+reports/figures/*
+!reports/figures/.gitkeep
+
+# Experiment tracking
+mlruns/
+wandb/
+
+# Logs
+*.log
+
+# Environment files / secrets
+.env
+.env.*
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
