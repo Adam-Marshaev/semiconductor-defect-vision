@@ -108,3 +108,50 @@ Next:
 
 Begin exploratory data analysis and leakage/duplicate investigation before
 finalizing train/validation/test splits.
+
+## 2026-09-21 - Initial EDA and Duplicate Audit
+
+Generated class-level and dataset-level EDA from the canonical manifest.
+
+Key findings:
+
+- label 3 represents approximately 87.3% of samples
+- labels 1 and 4 have substantially larger defect areas than label 3
+- label 1 has more connected defect components on average
+- median defect area is approximately 1.69% of image pixels
+- maximum observed defect fraction is approximately 84.6%
+- maximum connected-component count is 45
+- 226 of 227 label-6 masks are empty
+
+Performed decoded-image SHA-256 duplicate audit:
+
+- 4,591 images
+- 4,591 unique hashes
+- zero exact duplicate groups
+
+Next:
+
+- inspect segmentation and geometry outliers
+- investigate the single non-empty label-6 sample
+- perform near-duplicate analysis
+- investigate dataset grouping/leakage risk
+- finalize train/validation/test methodology only afterward
+
+## 2026-09-21 - Qualitative Outlier Review
+
+Visually reviewed selected EDA outliers.
+
+Findings:
+
+- the largest-mask sample represents a genuine large defect occupying most of
+  the SEM field of view
+- the 45-component sample contains many visually distinct defects, supporting
+  the connected-component result
+- the single non-empty label-6 sample contains a very small visible feature
+- the visible extent of that feature appears slightly larger than the canonical
+  mask-derived bounding box
+
+The label-6 case will receive targeted raw-mask threshold analysis before the
+mask normalization policy is considered fully finalized.
+
+No geometric outliers have been removed.

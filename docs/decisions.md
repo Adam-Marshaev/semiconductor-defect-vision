@@ -135,3 +135,21 @@ difficult.
 
 The dataset provides pixel-level masks for all 4,591 samples, making
 segmentation the more natural central task.
+
+---
+
+## D008 - Do Not Manually Correct Expert Ground Truth
+
+Decision:
+
+Preserve expert-provided Carinthia-S masks even when visual inspection suggests
+that a visible feature may extend slightly beyond the annotated region.
+
+Reason:
+
+The project should evaluate against the published dataset's expert-validated
+ground truth rather than introduce undocumented project-specific relabeling.
+
+The single non-empty label-6 sample was tested across mask thresholds from 1
+through 254. Its 50-pixel mask and 16 x 8 bounding box were invariant, proving
+that the observed visual discrepancy is not caused by our thresholding rule.

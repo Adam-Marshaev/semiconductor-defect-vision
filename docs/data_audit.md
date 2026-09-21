@@ -212,3 +212,211 @@ The following remain to be investigated:
 
 Train/validation/test splits must not be finalized until leakage/grouping
 analysis is complete.
+
+## Initial Exploratory Data Analysis
+
+Initial EDA was generated from the validated canonical manifest.
+
+### Class-Level Defect Geometry
+
+| Label | Samples | Mean defect fraction | Median defect fraction | Mean components | Median components |
+|------:|--------:|---------------------:|-----------------------:|----------------:|------------------:|
+| 1 | 55 | 0.110899 | 0.079470 | 4.036 | 2 |
+| 2 | 8 | 0.018841 | 0.019193 | 2.500 | 3 |
+| 3 | 4,008 | 0.019669 | 0.016667 | 1.217 | 1 |
+| 4 | 289 | 0.114646 | 0.073720 | 1.163 | 1 |
+| 5 | 4 | 0.032584 | 0.026858 | 1.000 | 1 |
+| 6 | 227 | 0.000001 | 0.000000 | 0.004 | 0 |
+
+Important observations:
+
+- Labels 1 and 4 contain substantially larger segmented regions than label 3.
+- Label 1 also contains more disconnected defect components on average.
+- Label 3 dominates the dataset numerically but typically contains relatively
+  small defect regions.
+- Label 6 is almost entirely composed of empty masks.
+- Labels 2 and 5 contain too few samples for strong class-specific statistical
+  conclusions.
+
+### Overall Segmentation Geometry
+
+Across all 4,591 samples:
+
+- mean defect fraction: 0.025778
+- median defect fraction: 0.016905
+- maximum defect fraction: 0.845668
+- median connected-component count: 1
+- maximum connected-component count: 45
+
+The typical defect therefore occupies only a small fraction of the image.
+
+This creates substantial pixel-level foreground/background imbalance and
+should be considered when selecting losses and evaluation metrics.
+
+The extreme maximum defect fraction and component count require visual
+inspection before deciding whether they represent legitimate defect
+morphology or annotation/outlier cases.
+
+### Class 6
+
+226 of 227 label-6 samples contain empty canonical masks.
+
+The Carinthia-S publication states that class 6 contains no visible defect
+because SEM acquisition can capture a neighboring area when the tool is
+misaligned.
+
+One label-6 sample has a non-empty canonical mask and should be individually
+inspected before drawing conclusions about whether it represents an
+annotation anomaly, an acquisition artifact, or a legitimate exception.
+
+### Exact Duplicate Audit
+
+Decoded grayscale SEM images were SHA-256 hashed.
+
+Results:
+
+- total samples: 4,591
+- unique decoded-image hashes: 4,591
+- exact duplicate groups: 0
+- samples involved in exact duplicate groups: 0
+- cross-label duplicate groups: 0
+
+Therefore no exact decoded-image duplicates were detected.
+
+This does not rule out near-duplicates such as shifted, cropped, contrast-
+modified, or otherwise highly similar SEM acquisitions.
+
+### Outlier Candidates Identified
+
+Quantitative EDA identified several samples requiring visual inspection.
+
+Non-empty label-6 sample:
+
+- sample ID: `8b782473c99742e394df74b430412232`
+- defect fraction: 0.000217
+- connected components: 1
+- bounding box: 16 x 8 pixels
+- approximately 50 canonical foreground pixels
+
+This sample is notable because the other 226 label-6 samples have empty masks.
+No correction should be made without visual inspection.
+
+Largest observed defect mask:
+
+- sample ID: `3531e9467b034961b1afe510af96fea1`
+- label: 4
+- defect fraction: 0.845668
+- connected components: 2
+- bounding box: 480 x 440 pixels
+
+Several of the largest masks belong to label 4 and span most or all of the
+image width.
+
+Highest connected-component count:
+
+- sample ID: `ed11de8d30a443328f589c582a43d972`
+- label: 3
+- defect fraction: 0.135582
+- connected components: 45
+- bounding box: 464 x 479 pixels
+
+Other highly fragmented samples are also primarily label 3.
+
+These samples require visual inspection before they are classified as
+legitimate morphology, annotation artifacts, or other outliers.
+
+### Qualitative Outlier Review
+
+Manual visual inspection was performed on selected quantitative outliers.
+
+#### Label-6 Non-Empty Sample
+
+Sample:
+
+`8b782473c99742e394df74b430412232`
+
+Observation:
+
+- A very small visible feature is present in the SEM image.
+- The canonical mask bounding box captures the central/core portion.
+- The visible feature appears to extend slightly beyond the derived bounding box,
+  including a small protruding region.
+
+Interpretation:
+
+The sample should not be automatically treated as corrupt. The discrepancy may
+reflect either conservative ground-truth annotation or loss of low-intensity
+boundary pixels during canonical mask thresholding.
+
+A targeted raw-mask threshold inspection is required before deciding whether
+this is an annotation anomaly or threshold artifact.
+
+#### Largest Defect Sample
+
+Sample:
+
+`3531e9467b034961b1afe510af96fea1`
+
+Observation:
+
+- The defect is genuinely very large.
+- The SEM view is effectively zoomed into the defect.
+- The defect legitimately occupies most of the image.
+
+Interpretation:
+
+The large defect fraction is valid morphology rather than an obvious annotation
+error.
+
+#### Highly Fragmented Sample
+
+Sample:
+
+`ed11de8d30a443328f589c582a43d972`
+
+Observation:
+
+- Many visually distinct defects are present.
+- The high connected-component count corresponds to visible defect structures.
+
+Interpretation:
+
+The high component count appears to represent legitimate morphology rather than
+simple annotation speckle.
+
+These findings demonstrate that extreme geometric statistics should not be
+removed automatically as outliers.
+
+#### Resolution of Label-6 Mask Threshold Investigation
+
+A targeted threshold audit was performed on the single non-empty label-6
+sample:
+
+`8b782473c99742e394df74b430412232`
+
+The raw grayscale mask contains only:
+
+- 0
+- 255
+
+The mask contains exactly 50 foreground pixels.
+
+Thresholds of 1, 32, 64, 96, 128, 160, 192, and 254 all produced the exact
+same result:
+
+- foreground pixels: 50
+- bounding box: 16 x 8
+- bounding-box origin: (203, 269)
+
+Therefore the visible feature extending slightly outside the annotated region
+is NOT caused by the canonical threshold of 128.
+
+The discrepancy exists in the supplied ground-truth annotation itself.
+
+Decision:
+
+Preserve the expert-provided annotation unchanged. Do not manually expand or
+otherwise modify the mask based on visual interpretation.
+
+This sample remains a documented annotation/appearance edge case rather than
+a data-cleaning target.
