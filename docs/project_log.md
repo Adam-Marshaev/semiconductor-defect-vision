@@ -174,3 +174,30 @@ The confirmed pair has been recorded as a leakage group and must remain within
 one dataset partition.
 
 The project is now ready to define a reproducible train/validation/test split.
+
+## 2026-09-21 - Dataset Split Frozen
+
+Created deterministic leakage-aware train/validation/test partitions using
+`scripts/build_splits.py`.
+
+Final sizes:
+
+- train: 3,673
+- validation: 459
+- test: 459
+
+All 4,591 samples are assigned exactly once.
+
+All six labels are represented in every partition.
+
+The known two-image near-duplicate group was kept entirely within the training
+partition.
+
+Random seed: 42.
+
+The resulting partition definition is stored in:
+
+`data/processed/splits.csv`
+
+Future models will consume this frozen split rather than generating their own
+random partitions.
