@@ -155,3 +155,22 @@ The label-6 case will receive targeted raw-mask threshold analysis before the
 mask normalization policy is considered fully finalized.
 
 No geometric outliers have been removed.
+
+## 2026-09-21 - Leakage Audit Completed
+
+Completed exact-duplicate and near-duplicate analysis.
+
+Results:
+
+- zero exact decoded-image duplicates
+- coarse similarity search performed across the full dataset
+- defect-only and per-class similarity searches performed
+- strongest candidate pairs manually reviewed
+- one confirmed two-image near-duplicate group identified in label 4
+- all other reviewed high-similarity candidates represented distinct physical
+  images
+
+The confirmed pair has been recorded as a leakage group and must remain within
+one dataset partition.
+
+The project is now ready to define a reproducible train/validation/test split.

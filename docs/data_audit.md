@@ -420,3 +420,173 @@ otherwise modify the mask based on visual interpretation.
 
 This sample remains a documented annotation/appearance edge case rather than
 a data-cleaning target.
+
+### Near-Duplicate Candidate Audit
+
+A low-resolution structural similarity audit was performed on all 4,591 SEM
+images.
+
+Method:
+
+- convert each image to grayscale
+- resize to 24 x 24
+- normalize mean and standard deviation
+- L2-normalize the resulting descriptor
+- identify nearest neighbors using cosine distance
+
+The 100 most similar candidate pairs were saved to:
+
+`reports/eda/near_duplicate_candidates.csv`
+
+The top-ranked pairs had cosine similarities of approximately 0.997-0.998.
+
+The first 20 ranked pairs were all label 6.
+
+Interpretation:
+
+This result is NOT currently considered evidence of duplicated data or
+train/test leakage.
+
+Label 6 contains almost exclusively images without visible annotated defects.
+After aggressive spatial downsampling and brightness/contrast normalization,
+such images may legitimately have very similar coarse SEM texture.
+
+The descriptor is therefore being treated as a candidate-generation method
+only. High cosine similarity does not imply that two samples are duplicates.
+
+The highest-ranked candidate pairs require visual inspection before deciding
+whether stronger near-duplicate controls are needed for dataset splitting.
+
+### Visual Review of Near-Duplicate Candidates
+
+The top near-duplicate candidates were visually inspected.
+
+Observation:
+
+- The highest-ranked pairs were almost entirely label-6 images.
+- These images are essentially defect-free / visually blank SEM fields.
+- Very slight visual differences can be observed between paired images.
+- No inspected pair clearly appeared to be the exact same SEM field duplicated
+  with only a shift, crop, or contrast change.
+
+Interpretation:
+
+The high cosine similarities are likely caused by the coarse 24 x 24
+descriptor collapsing many low-information, defect-free SEM images into very
+similar representations.
+
+These pairs are therefore not currently treated as duplicates or evidence of
+data leakage.
+
+However, because label-6 images dominate the nearest-neighbor ranking, a second
+near-duplicate audit should exclude label 6 so that potentially similar
+defect-bearing images are not hidden by the no-defect class.
+
+### Suspected Near-Duplicate Defect Pair
+
+Visual inspection of the top defect-bearing near-duplicate candidates found one
+pair requiring additional investigation:
+
+- `6830f9ceb59a485681c6f5392493edc9`
+- `b76d11f40521489ca4d2bf47804d81d1`
+- label: 4 for both samples
+- coarse cosine similarity: 0.991817
+
+The two images appear to contain the same scratch morphology and spatial
+structure, while differing primarily in image contrast.
+
+The remaining visually inspected top-ranked pairs appeared to represent
+different SEM fields.
+
+This pair is currently treated as a suspected near duplicate. It must not be
+allowed to cross train/validation/test boundaries if the similarity is
+confirmed.
+
+A full-resolution alignment and contrast-invariant comparison will be used to
+investigate the relationship.
+
+#### Confirmed Near-Duplicate Pair
+
+Manual full-resolution visual inspection confirmed that the following two
+label-4 images represent the same apparent scratch structure:
+
+- `6830f9ceb59a485681c6f5392493edc9`
+- `b76d11f40521489ca4d2bf47804d81d1`
+
+The images share the same fine-scale grooves, edges, bends, and spatial
+geometry. The primary apparent difference is image contrast.
+
+Given the highly magnified SEM field of view, this degree of detailed
+structural agreement is considered strong evidence that the samples are
+near-duplicate observations of the same physical defect or acquisition field.
+
+Decision:
+
+These samples must be assigned to the same train/validation/test partition.
+
+They must never be independently randomized across dataset splits.
+
+The basis for this grouping is:
+
+- high coarse-descriptor similarity: 0.991817
+- identical fine-scale morphology under manual visual inspection
+- apparent contrast variation rather than different defect geometry
+
+#### Near-Duplicate Family Search
+
+A targeted nearest-neighbor search was performed across all 289 label-4
+samples for both members of the confirmed near-duplicate pair.
+
+For each image, its counterpart had cosine similarity:
+
+- 0.991817
+
+The next-nearest candidates had similarities of approximately:
+
+- 0.831-0.839
+
+There is therefore a substantial separation between the confirmed pair and
+the remainder of label 4 under the coarse structural descriptor.
+
+No additional member of this apparent scratch/acquisition family was identified.
+
+The two samples are represented in:
+
+`data/processed/leakage_groups.csv`
+
+as leakage group:
+
+`near_duplicate_001`
+
+### Final Near-Duplicate Review
+
+The strongest within-class similarity candidates were manually reviewed for
+labels 1, 2, 4, and 5.
+
+Findings:
+
+- Label 1 candidates were visually distinct physical SEM images.
+- Label 2 pair #1 had similar coarse framing/box structure, but the actual
+  defect line geometry differed: one was visibly squiggled while the other
+  was straighter. They are considered distinct physical images.
+- Label 4 pair #1 was the previously confirmed near-duplicate pair representing
+  the same apparent physical scratch with contrast variation.
+- Remaining label 4 candidates were visually distinct.
+- Label 5 candidates were visually distinct.
+- Previously reviewed high-similarity label 3 candidates were also visually
+  distinct.
+- Label 6 similarity was dominated by nearly blank/no-defect SEM fields and did
+  not reveal clear repeated physical scenes.
+
+Final leakage-audit conclusion:
+
+- no exact decoded-image duplicates were detected
+- one two-sample near-duplicate group was confirmed
+- no additional near-duplicate groups were identified during manual review of
+  the strongest similarity candidates
+
+The confirmed pair must remain in the same train/validation/test partition.
+
+Similarity score alone is not used as a duplicate criterion. High similarity
+can result from shared defect morphology, imaging geometry, or low-information
+no-defect images. Manual comparison of fine physical structure is required.

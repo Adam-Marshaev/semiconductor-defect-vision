@@ -153,3 +153,24 @@ ground truth rather than introduce undocumented project-specific relabeling.
 The single non-empty label-6 sample was tested across mask thresholds from 1
 through 254. Its 50-pixel mask and 16 x 8 bounding box were invariant, proving
 that the observed visual discrepancy is not caused by our thresholding rule.
+
+---
+
+## D009 - Near-Duplicate Samples Must Be Grouped During Splitting
+
+Decision:
+
+Samples determined to represent the same physical SEM defect or acquisition
+field must be assigned as a group during train/validation/test splitting.
+
+Known group:
+
+- `6830f9ceb59a485681c6f5392493edc9`
+- `b76d11f40521489ca4d2bf47804d81d1`
+
+Reason:
+
+Allowing contrast-varied or otherwise near-duplicate views of the same physical
+structure to appear in different partitions would leak highly specific visual
+information from training into validation or test data and inflate measured
+generalization performance.

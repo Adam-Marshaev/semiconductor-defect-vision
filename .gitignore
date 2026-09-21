@@ -59,3 +59,6 @@ wandb/
 build/
 dist/
 *.egg-info/
+
+# Leakage/grouping metadata
+!data/processed/leakage_groups.csv
