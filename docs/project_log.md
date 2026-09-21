@@ -278,3 +278,36 @@ Next:
 
 Begin the learned segmentation phase using PyTorch while preserving the same
 frozen dataset split and evaluation definitions.
+
+## 2026-09-21 - Compact U-Net Baseline Trained
+
+Completed the first learned segmentation experiment.
+
+Compact U-Net:
+
+- 7.76M parameters
+- 20 epochs
+- AdamW
+- BCE + Dice loss
+- batch size 8
+- FP32 training
+- horizontal/vertical flip augmentation
+
+Best result occurred at epoch 20:
+
+- validation Dice: 0.9498
+- validation IoU: 0.9149
+- non-empty Dice: 0.9473
+- empty-target accuracy: 100%
+
+This improves validation Dice by approximately 0.494 over the selected Otsu
+baseline.
+
+Peak allocated V100 memory was approximately 5.04 GiB.
+
+The test partition remains untouched.
+
+Next:
+
+Perform per-image and per-class validation error analysis using the saved best
+checkpoint.

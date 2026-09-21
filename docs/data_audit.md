@@ -590,3 +590,26 @@ The confirmed pair must remain in the same train/validation/test partition.
 Similarity score alone is not used as a duplicate criterion. High similarity
 can result from shared defect morphology, imaging geometry, or low-information
 no-defect images. Manual comparison of fine physical structure is required.
+
+## Qualitative annotation observations from U-Net validation review
+
+Manual inspection of the lowest-Dice U-Net validation predictions showed that
+not every large mask disagreement corresponded to an obvious model failure.
+
+Observed patterns included:
+
+- Some label-3 reference masks contain a broad square/rectangular region around
+  the visually apparent defect. The U-Net sometimes ignores this region and
+  predicts only the visible defect structure.
+- Some label-1 reference masks cover a broader cluster region, while the U-Net
+  produces tighter masks around individual visible defects.
+- Some predictions detect very small visible structures that are not included
+  in the supplied reference mask.
+- Genuine model errors also occur, including missed portions of visible defects.
+
+Therefore, low Dice on individual samples can arise from both genuine
+segmentation errors and differences between the morphology represented by the
+reference annotation and the tighter morphology predicted by the model.
+
+No ground-truth labels are being modified. The supplied masks remain the
+canonical evaluation targets.

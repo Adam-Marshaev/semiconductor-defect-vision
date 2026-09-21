@@ -258,3 +258,157 @@ The global Otsu pipeline from E001 remains the selected classical-CV baseline.
 The test partition has NOT been evaluated.
 
 The classical baseline is frozen based only on validation results.
+
+## E003 - Compact U-Net Segmentation Baseline
+
+### Architecture
+
+A compact U-Net was trained for semantic defect segmentation.
+
+Configuration:
+
+- input channels: 1
+- output channels: 1
+- base channels: 32
+- trainable parameters: 7,762,465
+- input resolution: 480 x 480
+
+### Data Pipeline
+
+Training partition:
+
+- 3,673 samples
+
+Validation partition:
+
+- 459 samples
+
+Test partition:
+
+- not loaded or evaluated
+
+Image preprocessing:
+
+- grayscale input scaled to [0, 1]
+- standardized using training-only statistics
+- training mean: 0.37754703
+- training standard deviation: 0.04998759
+
+Training augmentation:
+
+- random horizontal flip
+- random vertical flip
+
+Validation augmentation:
+
+- none
+
+### Optimization
+
+- optimizer: AdamW
+- initial learning rate: 1e-3
+- weight decay: 1e-4
+- batch size: 8
+- loss: 0.5 BCE + 0.5 Dice loss
+- maximum epochs: 20
+- validation model-selection metric: mean per-image Dice
+- prediction threshold: 0.5
+- random seed: 42
+
+ReduceLROnPlateau reduced the learning rate during training:
+
+- 1e-3
+- 5e-4
+- 2.5e-4
+
+### Best Validation Result
+
+Best epoch:
+
+20
+
+Metrics:
+
+- mean Dice: 0.949786
+- mean IoU: approximately 0.9149
+- non-empty mean Dice: approximately 0.9473
+- empty-target accuracy: 1.000
+- validation loss: 0.0307
+
+All 22 empty validation targets were predicted empty at the 0.5 prediction
+threshold.
+
+Peak allocated GPU memory:
+
+- 5.042 GiB
+
+GPU:
+
+- NVIDIA Tesla V100-SXM2-32GB
+
+### Comparison with Classical Baseline
+
+Selected global Otsu baseline validation Dice:
+
+0.455618
+
+Compact U-Net validation Dice:
+
+0.949786
+
+Absolute Dice improvement:
+
++0.494168
+
+The learned model therefore substantially outperformed both classical
+intensity-thresholding baselines on the same frozen validation partition.
+
+### Test Status
+
+The test partition has NOT been evaluated.
+
+The saved best checkpoint is:
+
+`models/unet_baseline_best.pt`
+
+Further analysis will use validation data before any final held-out test
+evaluation.
+
+### E003 Qualitative Error Analysis
+
+The best U-Net checkpoint was evaluated per image on the frozen validation
+partition.
+
+Validation summary:
+
+- mean Dice: 0.949786
+- mean IoU: 0.914906
+- non-empty mean Dice: 0.947258
+- empty-target accuracy: 1.000000
+
+Per-class mean Dice:
+
+- label 1: 0.782835 (5 samples)
+- label 2: 0.905150 (1 sample)
+- label 3: 0.946832 (401 samples)
+- label 4: 0.982951 (29 samples)
+- label 5: 0.947489 (1 sample)
+- label 6: 1.000000 (22 samples)
+
+The lowest-scoring label-3 samples frequently showed very high precision and
+very low recall. Qualitative inspection showed that several such cases involved
+tight predictions around visually apparent defects while the reference mask
+covered a broader region.
+
+Label-1 predictions showed a related pattern: the reference mask can cover a
+general clustered region while the network traces individual visible defect
+structures more tightly.
+
+Some genuine false negatives were also observed.
+
+These findings reinforce the need to interpret Dice together with visual
+inspection and precision/recall rather than treating every reference-mask
+disagreement as the same type of failure.
+
+The supplied masks remain unchanged and continue to serve as the canonical
+quantitative evaluation targets.

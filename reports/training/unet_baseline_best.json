@@ -1,0 +1,22 @@
+{
+  "model": "compact_unet",
+  "selection_split": "val",
+  "selection_metric": "mean_per_image_dice",
+  "best_epoch": 20,
+  "best_validation_metrics": {
+    "epoch": 20,
+    "learning_rate": 0.00025,
+    "train_loss": 0.025551019363224976,
+    "val_loss": 0.030744992441247666,
+    "val_mean_dice": 0.9497862458229065,
+    "val_mean_iou": 0.9149060249328613,
+    "val_mean_dice_nonempty": 0.9472583532333374,
+    "val_mean_iou_nonempty": 0.9106221795082092,
+    "val_empty_target_accuracy": 1.0
+  },
+  "parameters": 7762465,
+  "batch_size": 8,
+  "peak_allocated_vram_gib": 5.042036056518555,
+  "test_evaluated": false,
+  "checkpoint": "models/unet_baseline_best.pt"
+}
