@@ -201,3 +201,80 @@ The resulting partition definition is stored in:
 
 Future models will consume this frozen split rather than generating their own
 random partitions.
+
+## 2026-09-21 - Classical Segmentation Baseline
+
+Implemented and unit-tested an OpenCV Otsu segmentation baseline.
+
+Evaluated 24 preprocessing/threshold/morphology configurations on the frozen
+validation partition only.
+
+Selected configuration:
+
+- 3 x 3 Gaussian blur
+- inverted Otsu threshold
+- 5 x 5 morphological opening
+
+Validation performance:
+
+- mean Dice: 0.4556
+- mean IoU: 0.3232
+- non-empty mean Dice: 0.4442
+- empty-target accuracy: 68.2%
+
+Performance varies strongly by defect class, with near-zero Dice for labels 1
+and 2 and substantially stronger performance for label 4.
+
+The test partition remains untouched.
+
+Next:
+
+Perform qualitative validation error analysis before finalizing the classical
+baseline.
+
+## 2026-09-21 - Otsu Error Analysis
+
+Performed qualitative inspection of validation predictions from the selected
+classical Otsu baseline.
+
+Observed:
+
+- broad block-like false-positive regions on some empty label-6 images
+- generally correct but incomplete defect coverage in strong predictions
+- missing boundary pixels in otherwise good segmentations
+- near-complete misses on several small defects
+- near-complete failure on at least one large label-1 defect
+
+The failures show that global intensity thresholding is not sufficient to
+represent all defect morphologies.
+
+Next:
+
+Evaluate a local adaptive-thresholding baseline on validation data only.
+
+## 2026-09-21 - Adaptive Threshold Baseline
+
+Evaluated 54 adaptive Gaussian threshold configurations on validation data.
+
+Best adaptive validation mean Dice:
+
+- 0.4078
+
+This was below the selected global Otsu baseline:
+
+- Otsu: 0.4556
+- adaptive: 0.4078
+
+Adaptive thresholding improved some low-contrast defect cases but generated
+foreground on every empty validation image.
+
+Conclusion:
+
+Local intensity information alone is also insufficient for robust segmentation.
+
+The Otsu configuration remains the selected classical-CV baseline.
+
+Next:
+
+Begin the learned segmentation phase using PyTorch while preserving the same
+frozen dataset split and evaluation definitions.

@@ -1,0 +1,14 @@
+{
+  "selection_split": "val",
+  "selection_metric": "mean_dice",
+  "config_id": 11,
+  "blur_kernel": 3,
+  "invert": true,
+  "morphology_kernel": 5,
+  "morphology_iterations": 1,
+  "mean_dice": 0.45561829029080647,
+  "mean_iou": 0.32318506592107255,
+  "mean_dice_nonempty": 0.4442306527310758,
+  "mean_iou_nonempty": 0.3051303095143531,
+  "empty_target_accuracy": 0.6818181818181818
+}

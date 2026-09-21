@@ -1,0 +1,16 @@
+{
+  "selection_split": "val",
+  "selection_metric": "mean_dice",
+  "config_id": 49,
+  "blur_kernel": 3,
+  "block_size": 61,
+  "c": 5.0,
+  "invert": true,
+  "morphology": "open",
+  "morphology_kernel": 3,
+  "mean_dice": 0.4078309019262501,
+  "mean_iou": 0.2658026065333755,
+  "mean_dice_nonempty": 0.42836243474633595,
+  "mean_iou_nonempty": 0.27918397345267587,
+  "empty_target_accuracy": 0.0
+}
