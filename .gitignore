@@ -10,6 +10,10 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+
 # IDE / editor
 .vscode/
 .idea/
@@ -17,22 +21,28 @@ venv/
 # OS
 .DS_Store
 
-# Dataset
+# Raw dataset
 data/raw/*
+
+# Keep documentation / placeholders
+!data/raw/.gitkeep
+!data/README.md
+
+# Processed data - ignore large generated artifacts
 data/processed/*
 
-# Keep documentation files inside data/
-!data/raw/.gitkeep
+# Keep small reproducibility metadata
 !data/processed/.gitkeep
-!data/README.md
+!data/processed/manifest.csv
+!data/processed/splits.csv
+!data/processed/validation_summary.json
 
 # Trained model artifacts
 models/*
 !models/.gitkeep
 
-# Generated reports
-reports/figures/*
-!reports/figures/.gitkeep
+# Generated experimental figures
+reports/figures/generated/
 
 # Experiment tracking
 mlruns/
@@ -49,7 +59,3 @@ wandb/
 build/
 dist/
 *.egg-info/
-
-# Tool caches
-.pytest_cache/
-.ruff_cache/
