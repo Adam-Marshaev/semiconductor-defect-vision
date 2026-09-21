@@ -1,0 +1,28 @@
+{
+  "csv_rows": 4591,
+  "validated_samples": 4591,
+  "validation_errors": 0,
+  "mask_threshold": 128,
+  "class_counts": {
+    "1": 55,
+    "2": 8,
+    "3": 4008,
+    "4": 289,
+    "5": 4,
+    "6": 227
+  },
+  "image_dimensions": {
+    "480x480": 4591
+  },
+  "mask_original_modes": {
+    "L": 4587,
+    "RGBA": 2,
+    "RGB": 2
+  },
+  "masks_with_intermediate_values": 395,
+  "empty_masks": 226,
+  "nonempty_masks": 4365,
+  "mean_defect_fraction": 0.025778394927273164,
+  "median_defect_fraction": 0.016905381944444443,
+  "errors": []
+}
