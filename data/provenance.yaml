@@ -1,0 +1,26 @@
+dataset:
+  name: Carinthia-S
+  source: https://zenodo.org/records/16895427
+  zenodo_record: 16895427
+
+downloaded_artifacts:
+  data_zip:
+    path: data/raw/data.zip
+    md5: 3a41242574635cf1302fab15accb7730
+
+  documentation:
+    path: data/raw/carinthia-s_dataset.html
+    md5: 4d9ca3ed51dfc97444939f742496d2d9
+
+local_structure:
+  dataset_root: data/raw/carinthia-s/data
+  images: data/raw/carinthia-s/data/images
+  masks: data/raw/carinthia-s/data/masks
+  metadata_csv: data/raw/carinthia-s/data/carinthia-s.csv
+
+observed_format:
+  image_count: 4591
+  mask_count: 4591
+  image_extension: jpg
+  mask_extension: png
+  image_mask_pairing: matching filename stems
