@@ -49,3 +49,7 @@ wandb/
 build/
 dist/
 *.egg-info/
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
