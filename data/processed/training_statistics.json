@@ -1,0 +1,8 @@
+{
+  "split": "train",
+  "samples": 3673,
+  "pixel_count": 846259200,
+  "image_mean": 0.3775470259852532,
+  "image_std": 0.04998758784343435,
+  "foreground_fraction": 0.02540717430309768
+}

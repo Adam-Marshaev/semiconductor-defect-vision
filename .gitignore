@@ -62,3 +62,6 @@ dist/
 
 # Leakage/grouping metadata
 !data/processed/leakage_groups.csv
+
+# Training-only normalization statistics
+!data/processed/training_statistics.json
