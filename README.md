@@ -53,6 +53,8 @@ Deep learning produced the major performance gain over the classical intensity-b
 
 Across the 437 nonempty validation images, SegFormer produced higher Dice than U-Net on 310 samples and lower Dice on 127.
 
+![Validation Dice comparison](reports/figures/readme/validation_dice_comparison.png)
+
 ## Final Test Performance
 
 The frozen SegFormer-B0 deployment configuration was evaluated once on the 459-image test split.
@@ -157,6 +159,8 @@ Hardware during the final benchmark series:
 | **SegFormer** | **FP16**  | **32** |    **62.07 ms** | **516 img/s** |
 
 At batch size 32, FP16 increased throughput by approximately 1.84× for both architectures.
+
+![V100 FP16 throughput scaling](reports/figures/readme/v100_fp16_throughput.png)
 
 ### End-to-end single-image inference
 
