@@ -679,3 +679,32 @@ storage-I/O benchmarks.
 
 The V100 remained at a 150 W power limit and recorded zero PCIe AER errors
 before and after the benchmark.
+
+## Self-contained SegFormer deployment initialization
+
+The SegFormer deployment path was changed so that production inference no
+longer initializes the architecture from the Hugging Face Hub.
+
+The exact binary SegFormer-B0 architecture configuration used for training was
+exported to:
+
+configs/segformer_b0_binary_config.json
+
+Training behavior remains unchanged and can still initialize from the
+nvidia/mit-b0 pretrained encoder. Production inference instead constructs the
+architecture from the local JSON configuration and then loads the trained
+checkpoint state dictionary.
+
+Parity was verified on validation sample
+a388040b307b4184a532d3e5dda02ffc:
+
+- previous/reference FP32 predicted pixels: 22817
+- local-config FP32 predicted pixels: 22817
+- previous/reference FP16 predicted pixels: 22809
+- local-config offline FP16 predicted pixels: 22809
+
+FP16 inference was additionally tested with HF_HUB_OFFLINE=1 and completed
+successfully. The returned probability map remained float32.
+
+The production inference path therefore requires the Transformers Python
+implementation but does not require network access or runtime model downloads.

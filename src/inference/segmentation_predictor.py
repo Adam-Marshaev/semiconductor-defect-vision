@@ -150,14 +150,13 @@ class SegmentationPredictor:
             self.image_mean = None
             self.image_std = None
 
-            model_name = checkpoint.get(
-                "model_name",
-                "nvidia/mit-b0",
-            )
-
             model = (
                 SegFormerBinarySegmenter(
-                    model_name=model_name,
+                    pretrained=False,
+                    config_path=Path(
+                        "configs/"
+                        "segformer_b0_binary_config.json"
+                    ),
                 )
             )
 
