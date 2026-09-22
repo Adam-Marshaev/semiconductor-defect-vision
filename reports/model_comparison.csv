@@ -1,0 +1,4 @@
+model,validation_dice,validation_iou,test_dice,test_iou,parameters,fp32_batch1_gpu_ms,fp16_batch1_gpu_ms,fp32_batch32_throughput_img_s,fp16_batch32_throughput_img_s,fp32_e2e_ms,fp16_e2e_ms,selected
+OpenCV_Otsu,0.455618,,,,0,,,,,,,false
+U-Net,0.949786,0.914906,,,7762465,8.303,5.107,156.941,288.894,10.200,6.669,false
+SegFormer-B0,0.955009,0.924103,0.957080,0.925138,3714401,5.370,4.300,280.716,515.582,6.636,6.293,true
