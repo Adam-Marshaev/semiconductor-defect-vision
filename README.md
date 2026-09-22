@@ -619,3 +619,17 @@ Potential extensions after the core project is published:
 
 These are extensions rather than requirements for the completed segmentation system.
 
+
+## Dataset Attribution
+
+This project uses the **Carinthia-S dataset** by Corinna Kofler and Vahidin Hasić,
+licensed under **CC BY 4.0**.
+
+DOI: https://doi.org/10.5281/zenodo.16895427
+
+Figures containing SEM imagery are derived from Carinthia-S and may include
+model predictions, masks, crops, annotations, or composite layouts.
+
+See [DATASET_NOTICE.md](DATASET_NOTICE.md) for full attribution and reuse details.
+
+The raw dataset and trained model checkpoints are not distributed in this repository.
