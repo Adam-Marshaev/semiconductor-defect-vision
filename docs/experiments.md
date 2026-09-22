@@ -618,3 +618,64 @@ and FP16 autocast at the selected 0.5 probability threshold. Combined with
 the substantial V100 inference speedups measured in the GPU benchmark, FP16
 autocast is the preferred deployment precision for subsequent inference
 engineering.
+
+## End-to-end segmentation inference benchmark
+
+A warm-cache single-image application benchmark was performed using the
+production SegmentationPredictor interface. Model initialization was excluded
+because a deployed inference service would load the model once and reuse it.
+
+The measured path included:
+
+JPEG file read and decode
+-> grayscale conversion
+-> NumPy/tensor preparation
+-> model-specific normalization
+-> host-to-device transfer
+-> model inference
+-> sigmoid and probability threshold
+-> device-to-host probability transfer
+-> binary mask returned to the caller
+
+Each configuration used 25 warmup images followed by 200 timed validation
+images. The test split remained untouched.
+
+Results:
+
+U-Net FP32:
+- mean latency: 10.200 ms
+- median latency: 10.148 ms
+- p95 latency: 11.036 ms
+- throughput: 98.0 images/s
+
+U-Net FP16 autocast:
+- mean latency: 6.669 ms
+- median latency: 6.817 ms
+- p95 latency: 6.960 ms
+- throughput: 149.9 images/s
+
+SegFormer-B0 FP32:
+- mean latency: 6.636 ms
+- median latency: 6.522 ms
+- p95 latency: 7.305 ms
+- throughput: 150.7 images/s
+
+SegFormer-B0 FP16 autocast:
+- mean latency: 6.293 ms
+- median latency: 6.254 ms
+- p95 latency: 7.168 ms
+- throughput: 158.9 images/s
+
+SegFormer-B0 FP16 autocast is the current preferred deployment configuration.
+It combines the highest validation segmentation quality with the lowest
+measured mean end-to-end single-image latency.
+
+The gap between GPU-only and end-to-end latency demonstrates measurable
+preprocessing, transfer, and result-materialization overhead, but the
+application is not dominated by those costs.
+
+These measurements are warm-cache workstation measurements rather than raw
+storage-I/O benchmarks.
+
+The V100 remained at a 150 W power limit and recorded zero PCIe AER errors
+before and after the benchmark.
