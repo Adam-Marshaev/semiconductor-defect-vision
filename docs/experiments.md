@@ -708,3 +708,39 @@ successfully. The returned probability map remained float32.
 
 The production inference path therefore requires the Transformers Python
 implementation but does not require network access or runtime model downloads.
+
+## Final frozen SegFormer-B0 test evaluation
+
+After completing all model selection, threshold analysis, mixed-precision validation, inference engineering, and deployment benchmarking, the frozen SegFormer-B0 configuration was evaluated once on the previously untouched 459-image test split.
+
+The final configuration was:
+
+- SegFormer-B0
+- best validation-selected checkpoint from epoch 19
+- local architecture configuration and local trained checkpoint
+- FP16 automatic mixed precision
+- probability threshold 0.50
+- 480x480 grayscale input
+- no additional test-driven tuning
+
+Final test performance:
+
+- mean Dice: 0.957080
+- mean IoU: 0.925138
+- nonempty mean Dice: 0.954919
+- empty-mask accuracy: 1.000000
+
+For comparison, the same frozen FP16 configuration achieved validation mean Dice 0.955007 and nonempty mean Dice 0.952742. Test performance therefore remained consistent with validation performance and showed no evidence of a substantial generalization drop.
+
+Test mean Dice by class:
+
+- class 1: 0.841441 across 6 samples
+- class 2: 0.831222 across 1 sample
+- class 3: 0.955995 across 400 samples
+- class 4: 0.968714 across 29 samples
+- class 5: 0.929305 across 1 sample
+- class 6: 1.000000 across 22 samples
+
+Class-2 and class-5 results should not be interpreted as robust estimates of class-level performance because each class contains only one test sample.
+
+The remaining low-Dice cases include both under-segmentation and over-segmentation failure modes. No model, threshold, preprocessing, or training changes were made after observing the test results.
