@@ -633,3 +633,13 @@ model predictions, masks, crops, annotations, or composite layouts.
 See [DATASET_NOTICE.md](DATASET_NOTICE.md) for full attribution and reuse details.
 
 The raw dataset and trained model checkpoints are not distributed in this repository.
+
+## Author
+
+Built by [Adam Marshaev](https://github.com/Adam-Marshaev).
+
+This repository contains my implementation, experiments, model training,
+evaluation, benchmarking, inference tooling, and deployment work.
+
+The Carinthia-S dataset is credited separately in
+[DATASET_NOTICE.md](DATASET_NOTICE.md).
