@@ -42,6 +42,9 @@ SPLITS_PATH = Path(
 CHECKPOINT_PATH = Path(
     "models/segformer_b0_best.pt"
 )
+LAST_CHECKPOINT_PATH = Path(
+    "models/segformer_b0_last.pt"
+)
 HISTORY_PATH = Path(
     "reports/training/segformer_b0_history.csv"
 )
@@ -332,8 +335,114 @@ def main() -> None:
 
     best_validation_dice = -1.0
     best_epoch = 0
-
     epochs_without_improvement = 0
+    start_epoch = 1
+
+    resume_path = None
+
+    if LAST_CHECKPOINT_PATH.exists():
+        resume_path = LAST_CHECKPOINT_PATH
+    elif (
+        CHECKPOINT_PATH.exists()
+        and HISTORY_PATH.exists()
+    ):
+        resume_path = CHECKPOINT_PATH
+
+    if resume_path is not None:
+        checkpoint = torch.load(
+            resume_path,
+            map_location=device,
+            weights_only=False,
+        )
+
+        model.load_state_dict(
+            checkpoint["model_state_dict"]
+        )
+
+        optimizer.load_state_dict(
+            checkpoint["optimizer_state_dict"]
+        )
+
+        if HISTORY_PATH.exists():
+            history = (
+                pd.read_csv(HISTORY_PATH)
+                .to_dict("records")
+            )
+
+        checkpoint_epoch = int(
+            checkpoint["epoch"]
+        )
+
+        if history:
+            history_last_epoch = int(
+                history[-1]["epoch"]
+            )
+
+            if (
+                resume_path == CHECKPOINT_PATH
+                and history_last_epoch
+                != checkpoint_epoch
+            ):
+                raise RuntimeError(
+                    "Legacy best checkpoint does not match "
+                    "the latest completed history epoch. "
+                    "Exact resume is not possible."
+                )
+
+            best_record = max(
+                history,
+                key=lambda row: row["val_dice"],
+            )
+
+            best_validation_dice = float(
+                best_record["val_dice"]
+            )
+            best_epoch = int(
+                best_record["epoch"]
+            )
+
+            epochs_without_improvement = (
+                history_last_epoch
+                - best_epoch
+            )
+
+        else:
+            best_validation_dice = float(
+                checkpoint["validation"]["dice"]
+            )
+            best_epoch = checkpoint_epoch
+
+        if "scheduler_state_dict" in checkpoint:
+            scheduler.load_state_dict(
+                checkpoint[
+                    "scheduler_state_dict"
+                ]
+            )
+
+        if (
+            "epochs_without_improvement"
+            in checkpoint
+        ):
+            epochs_without_improvement = int(
+                checkpoint[
+                    "epochs_without_improvement"
+                ]
+            )
+
+        start_epoch = checkpoint_epoch + 1
+
+        print(
+            f"Resuming from epoch "
+            f"{checkpoint_epoch}"
+        )
+        print(
+            f"Next epoch: {start_epoch}"
+        )
+        print(
+            "Resume checkpoint:",
+            resume_path,
+        )
+        print()
 
     torch.cuda.reset_peak_memory_stats(
         device
@@ -379,10 +488,9 @@ def main() -> None:
     )
     print()
 
-    training_start = time.perf_counter()
 
     for epoch in range(
-        1,
+        start_epoch,
         MAX_EPOCHS + 1,
     ):
         epoch_start = time.perf_counter()
@@ -477,6 +585,10 @@ def main() -> None:
                     "optimizer_state_dict": (
                         optimizer.state_dict()
                     ),
+                    "scheduler_state_dict": (
+                        scheduler.state_dict()
+                    ),
+                    "epochs_without_improvement": 0,
                     "validation": validation,
                     "prediction_threshold": (
                         PREDICTION_THRESHOLD
@@ -495,6 +607,33 @@ def main() -> None:
         else:
             epochs_without_improvement += 1
 
+        torch.save(
+            {
+                "epoch": epoch,
+                "model_name": MODEL_NAME,
+                "model_state_dict": (
+                    model.state_dict()
+                ),
+                "optimizer_state_dict": (
+                    optimizer.state_dict()
+                ),
+                "scheduler_state_dict": (
+                    scheduler.state_dict()
+                ),
+                "validation": validation,
+                "prediction_threshold": (
+                    PREDICTION_THRESHOLD
+                ),
+                "parameter_count": (
+                    parameter_count
+                ),
+                "epochs_without_improvement": (
+                    epochs_without_improvement
+                ),
+            },
+            LAST_CHECKPOINT_PATH,
+        )
+
         pd.DataFrame(
             history
         ).to_csv(
@@ -512,9 +651,9 @@ def main() -> None:
             )
             break
 
-    total_seconds = (
-        time.perf_counter()
-        - training_start
+    total_seconds = sum(
+        float(record["epoch_seconds"])
+        for record in history
     )
 
     peak_vram_gib = (

@@ -311,3 +311,35 @@ Next:
 
 Perform per-image and per-class validation error analysis using the saved best
 checkpoint.
+
+## 2026-09-21 - SegFormer-B0 Baseline Completed
+
+Completed transformer segmentation experiment E004.
+
+SegFormer-B0:
+
+- 3.71M parameters
+- ImageNet-pretrained MiT-B0 encoder
+- 20 epochs
+- batch size 8
+- BCE + Dice loss
+- FP32 training
+
+Best epoch: 19
+
+Validation:
+
+- Dice: 0.9550
+- IoU: 0.9241
+- non-empty Dice: 0.9527
+- empty-target accuracy: 100%
+
+SegFormer exceeded the compact U-Net validation Dice by approximately 0.0052
+while using fewer than half as many parameters.
+
+The test split remains untouched.
+
+Next step:
+
+Perform per-image and per-class validation error analysis on the best
+SegFormer checkpoint and compare failure modes against U-Net.

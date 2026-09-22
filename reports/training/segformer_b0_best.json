@@ -1,0 +1,21 @@
+{
+  "experiment": "E004",
+  "model": "SegFormer-B0",
+  "pretrained_encoder": "nvidia/mit-b0",
+  "parameters": 3714401,
+  "batch_size": 8,
+  "initial_learning_rate": 0.0001,
+  "weight_decay": 0.0001,
+  "max_epochs": 20,
+  "epochs_completed": 20,
+  "best_epoch": 19,
+  "best_validation_dice": 0.9550091543610516,
+  "unet_validation_dice": 0.949786,
+  "otsu_validation_dice": 0.45561829029080647,
+  "difference_vs_unet": 0.005223154361051585,
+  "difference_vs_otsu": 0.49939086407024513,
+  "peak_allocated_vram_gib": 2.455228805541992,
+  "total_training_seconds": 1468.5838108089993,
+  "prediction_threshold": 0.5,
+  "test_evaluated": false
+}

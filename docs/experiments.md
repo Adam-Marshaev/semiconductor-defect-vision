@@ -412,3 +412,59 @@ disagreement as the same type of failure.
 
 The supplied masks remain unchanged and continue to serve as the canonical
 quantitative evaluation targets.
+
+## E004 - SegFormer-B0 Segmentation Baseline
+
+SegFormer-B0 was fine-tuned using the frozen Carinthia-S training and validation
+partitions.
+
+Configuration:
+
+- pretrained encoder: nvidia/mit-b0
+- trainable parameters: 3,714,401
+- input: grayscale SEM replicated to three channels
+- input resolution: 480 x 480
+- batch size: 8
+- optimizer: AdamW
+- initial learning rate: 1e-4
+- weight decay: 1e-4
+- loss: 0.5 BCE + 0.5 Dice
+- prediction threshold: 0.5
+- training augmentation: horizontal and vertical flips
+- model selection metric: validation mean Dice
+- maximum epochs: 20
+
+Training was interrupted after epoch 7 and resumed from the saved checkpoint.
+Resume support was subsequently added to the training pipeline.
+
+ReduceLROnPlateau reduced the learning rate from:
+
+- 1e-4
+- to 5e-5
+
+Best result occurred at epoch 19.
+
+Best validation metrics:
+
+- mean Dice: 0.955009
+- mean IoU: approximately 0.9241
+- non-empty mean Dice: approximately 0.9527
+- empty-target accuracy: 1.000
+
+Peak allocated GPU memory:
+
+- 2.455 GiB
+
+Total recorded epoch training time:
+
+- approximately 24.5 minutes
+
+Comparison:
+
+- Otsu validation Dice: 0.455618
+- U-Net validation Dice: 0.949786
+- SegFormer-B0 validation Dice: 0.955009
+- SegFormer improvement over U-Net: +0.005223
+- SegFormer improvement over Otsu: +0.499391
+
+The test partition remains untouched.
