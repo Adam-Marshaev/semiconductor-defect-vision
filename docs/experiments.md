@@ -592,3 +592,29 @@ in addition to model parameter size.
 These GPU-resident results should not be interpreted as complete end-to-end
 application latency. CPU preprocessing, image decoding, data transfer, and
 postprocessing will be benchmarked separately.
+
+## Mixed-precision validation
+
+FP16 automatic mixed precision was evaluated on the complete frozen validation
+split for both segmentation models before selecting a deployment precision.
+The test split remained untouched.
+
+U-Net:
+- FP32 mean Dice: 0.949786
+- FP16 mean Dice: 0.949794
+- Dice difference: +0.000008
+- FP16-vs-FP32 binary prediction disagreement: 0.000161%
+
+SegFormer-B0:
+- FP32 mean Dice: 0.955009
+- FP16 mean Dice: 0.955007
+- Dice difference: -0.000002
+- FP16-vs-FP32 binary prediction disagreement: 0.000191%
+
+Empty-mask accuracy remained 1.0 for both models.
+
+These results show effectively equivalent segmentation quality between FP32
+and FP16 autocast at the selected 0.5 probability threshold. Combined with
+the substantial V100 inference speedups measured in the GPU benchmark, FP16
+autocast is the preferred deployment precision for subsequent inference
+engineering.
