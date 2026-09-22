@@ -17,6 +17,11 @@ ModelType = Literal[
     "segformer",
 ]
 
+Precision = Literal[
+    "fp32",
+    "fp16",
+]
+
 
 @dataclass(frozen=True)
 class SegmentationPrediction:
@@ -75,6 +80,7 @@ class SegmentationPredictor:
         *,
         threshold: float = 0.5,
         device: torch.device | None = None,
+        precision: Precision = "fp32",
         statistics_path: Path = Path(
             "data/processed/"
             "training_statistics.json"
@@ -86,8 +92,17 @@ class SegmentationPredictor:
                 "between 0 and 1"
             )
 
+        if precision not in (
+            "fp32",
+            "fp16",
+        ):
+            raise ValueError(
+                f"Unsupported precision: {precision}"
+            )
+
         self.model_type = model_type
         self.threshold = threshold
+        self.precision = precision
 
         self.device = (
             device
@@ -98,6 +113,14 @@ class SegmentationPredictor:
                 else "cpu"
             )
         )
+
+        if (
+            self.precision == "fp16"
+            and self.device.type != "cuda"
+        ):
+            raise ValueError(
+                "FP16 inference requires CUDA"
+            )
 
         checkpoint = torch.load(
             checkpoint_path,
@@ -190,7 +213,17 @@ class SegmentationPredictor:
             image
         )
 
-        with torch.inference_mode():
+        with (
+            torch.inference_mode(),
+            torch.autocast(
+                device_type=self.device.type,
+                dtype=torch.float16,
+                enabled=(
+                    self.precision
+                    == "fp16"
+                ),
+            ),
+        ):
             logits = self.model(
                 tensor
             )
@@ -201,6 +234,7 @@ class SegmentationPredictor:
 
         probability_array = (
             probability
+            .float()
             .cpu()
             .numpy()
             .astype(
