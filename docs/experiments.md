@@ -519,3 +519,31 @@ performs better on small-defect images.
 Some metric differences reflect agreement with annotation morphology rather
 than an unambiguous difference in visually ideal defect boundaries. Canonical
 ground-truth masks were not modified.
+
+## Validation probability-threshold analysis
+
+A validation-only probability-threshold sweep from 0.10 through 0.90 in
+increments of 0.05 was performed for both U-Net and SegFormer-B0. The test
+split remained untouched.
+
+U-Net:
+- threshold 0.50 mean Dice: 0.949786
+- best tested threshold: 0.20
+- best mean Dice: 0.950336
+- improvement over 0.50: +0.000550
+
+SegFormer-B0:
+- threshold 0.50 mean Dice: 0.955009
+- best tested threshold: 0.45
+- best mean Dice: 0.955049
+- improvement over 0.50: +0.000040
+
+Empty-mask accuracy remained 1.0 for both models across every tested threshold.
+
+Lowering the U-Net threshold increased recall while reducing precision, but the
+resulting mean-Dice gain was only 0.00055. SegFormer performance was especially
+flat around 0.40-0.55.
+
+Because threshold optimization produced negligible validation improvement and
+could encourage overfitting to the validation split, the common probability
+threshold of 0.50 was retained for both models.
