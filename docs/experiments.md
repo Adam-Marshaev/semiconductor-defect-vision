@@ -468,3 +468,54 @@ Comparison:
 - SegFormer improvement over Otsu: +0.499391
 
 The test partition remains untouched.
+
+## E004 validation error analysis — U-Net vs SegFormer-B0
+
+SegFormer-B0 and U-Net were evaluated on the same frozen 459-image
+validation split at a probability threshold of 0.5. The test split remained
+untouched.
+
+Overall validation performance:
+
+- U-Net mean Dice: 0.949786
+- SegFormer-B0 mean Dice: 0.955009
+- Dice difference: +0.005223 for SegFormer
+- Nonempty mean Dice difference: +0.005486
+
+Per-class mean Dice differences favored SegFormer for classes 1-4, were equal
+for empty-mask class 6, and favored U-Net on the single class-5 validation
+sample. Class-1 and class-5 conclusions are limited by their very small
+validation sample counts.
+
+Across the 437 nonempty validation images, SegFormer improved Dice on 310
+samples and regressed on 127.
+
+Qualitative inspection showed that SegFormer often improved recall by covering
+more of the annotated defect region. On several class-1 examples, U-Net
+produced tight masks around individual small defect structures while SegFormer
+produced broader, sometimes connected masks that more closely matched the
+ground-truth annotation, which itself represented a broader defect region.
+
+For label-3 improvements, SegFormer sometimes recovered visible portions of
+the defect missed by U-Net.
+
+Most regressions were visually small differences. SegFormer was sometimes
+tighter around the main annotated region. In one visually inspected case,
+U-Net detected a small satellite feature that SegFormer omitted, but that
+feature was also absent from the ground-truth mask; therefore this example is
+not evidence that U-Net better recovers annotated satellite defects.
+
+Defect-area quartile analysis showed that SegFormer achieved higher mean Dice
+in every validation target-area quartile:
+
+- Q1 smallest: 0.910439 -> 0.915688
+- Q2 small:    0.957777 -> 0.965415
+- Q3 large:    0.955563 -> 0.958890
+- Q4 largest:  0.965592 -> 0.971324
+
+Thus the validation evidence does not support a general claim that U-Net
+performs better on small-defect images.
+
+Some metric differences reflect agreement with annotation morphology rather
+than an unambiguous difference in visually ideal defect boundaries. Canonical
+ground-truth masks were not modified.
