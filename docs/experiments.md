@@ -547,3 +547,48 @@ flat around 0.40-0.55.
 Because threshold optimization produced negligible validation improvement and
 could encourage overfitting to the validation split, the common probability
 threshold of 0.50 was retained for both models.
+
+## V100 GPU-resident segmentation inference benchmark
+
+U-Net and SegFormer-B0 were benchmarked on the NVIDIA Tesla V100 using
+480x480 inputs. Measurements isolate GPU-resident inference and include model
+forward pass, sigmoid, and binary thresholding. Disk I/O, image decoding,
+host-to-device transfer, and CPU preprocessing are excluded.
+
+Hardware during this benchmark:
+- NVIDIA Tesla V100-SXM2-32GB
+- 150 W power limit
+- PCIe Gen3 x8 negotiated link
+- zero PCIe AER correctable errors before and after the benchmark
+
+Each configuration used 20 warmup iterations followed by 50 timed iterations.
+
+Key results:
+
+Batch 1:
+- U-Net FP32: 8.303 ms, 120.4 images/s
+- U-Net FP16 autocast: 5.107 ms, 195.8 images/s
+- SegFormer-B0 FP32: 5.370 ms, 186.2 images/s
+- SegFormer-B0 FP16 autocast: 4.300 ms, 232.6 images/s
+
+Batch 32:
+- U-Net FP32: 203.899 ms/batch, 156.9 images/s
+- U-Net FP16 autocast: 110.767 ms/batch, 288.9 images/s
+- SegFormer-B0 FP32: 113.994 ms/batch, 280.7 images/s
+- SegFormer-B0 FP16 autocast: 62.066 ms/batch, 515.6 images/s
+
+At batch 32, SegFormer-B0 delivered approximately 1.79x the throughput of
+U-Net in both FP32 and FP16 autocast. FP16 autocast improved batch-32
+throughput by approximately 1.84x for both architectures.
+
+SegFormer-B0 also has fewer parameters (3.71M vs 7.76M) and higher validation
+Dice (0.9550 vs 0.9498), making it the current leading deployment candidate.
+
+Peak allocated memory did not strictly follow parameter count. SegFormer used
+less memory than U-Net for FP32 batch-32 inference, but more memory under FP16
+autocast. This indicates that activation/workspace requirements are important
+in addition to model parameter size.
+
+These GPU-resident results should not be interpreted as complete end-to-end
+application latency. CPU preprocessing, image decoding, data transfer, and
+postprocessing will be benchmarked separately.
