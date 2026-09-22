@@ -744,3 +744,37 @@ Test mean Dice by class:
 Class-2 and class-5 results should not be interpreted as robust estimates of class-level performance because each class contains only one test sample.
 
 The remaining low-Dice cases include both under-segmentation and over-segmentation failure modes. No model, threshold, preprocessing, or training changes were made after observing the test results.
+
+## Dockerized GPU inference reproducibility
+
+A production inference container was built using Python 3.10, PyTorch
+2.14.0+cu126, Transformers 5.17.0, and the local SegFormer-B0 architecture
+configuration.
+
+The trained checkpoint is mounted into the container at runtime rather than
+baked into the image.
+
+GPU access through NVIDIA Container Toolkit was verified inside the container:
+
+- PyTorch: 2.14.0+cu126
+- CUDA available: true
+- GPU: Tesla V100-SXM2-32GB
+- compute capability: 7.0
+
+The container was configured with HF_HUB_OFFLINE=1 and
+TRANSFORMERS_OFFLINE=1, confirming that production inference does not require
+runtime Hugging Face Hub access.
+
+Reproducibility was verified on validation sample
+a388040b307b4184a532d3e5dda02ffc.
+
+FP16 predicted foreground pixels:
+
+- host production predictor: 22809
+- host CLI: 22809
+- Docker GPU CLI: 22809
+
+The Docker-generated mask was a 480x480 uint8 PNG containing only values
+0 and 255 and exactly 22809 foreground pixels.
+
+PCIe AER counters remained at zero after the containerized GPU inference test.
