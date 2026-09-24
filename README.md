@@ -26,7 +26,7 @@ A narrated demonstration of the SegFormer-B0 inference pipeline, including
 successful segmentations, a model limitation, and a model–annotation
 disagreement case.
 
-[▶ Watch the segmentation demo](reports/semiconductor_defect_segmentation_demo.mp4)
+[▶ Watch the segmentation demo](https://github.com/Adam-Marshaev/semiconductor-defect-vision/releases/download/v0.1.0/semiconductor_defect_segmentation_demo.mp4)
 
 ---
 

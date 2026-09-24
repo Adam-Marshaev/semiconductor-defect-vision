@@ -65,3 +65,4 @@ dist/
 
 # Training-only normalization statistics
 !data/processed/training_statistics.json
+reports/*.mp4
