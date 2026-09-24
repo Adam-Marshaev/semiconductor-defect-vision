@@ -20,6 +20,16 @@ The project compares classical image processing, CNN-based semantic segmentation
 * NVIDIA GPU Docker deployment
 * Final evaluation performed once on the previously untouched test split
 
+## Demo
+
+A narrated demonstration of the SegFormer-B0 inference pipeline, including
+successful segmentations, a model limitation, and a model–annotation
+disagreement case.
+
+[▶ Watch the segmentation demo](reports/semiconductor_defect_segmentation_demo.mp4)
+
+---
+
 ## Final Result
 
 The selected deployment configuration is:
